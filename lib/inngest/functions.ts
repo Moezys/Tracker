@@ -6,10 +6,40 @@ import { getWatchlistSymbolsByEmail } from "@/lib/actions/watchlist.actions";
 import { getNews } from "@/lib/actions/finnhub.actions";
 import { getFormattedTodayDate } from "@/lib/utils";
 
+interface InngestAIModel {
+    model: string;
+}
+
+interface InngestAI {
+    infer: (id: string, config: {
+        model: InngestAIModel;
+        body: {
+            contents: Array<{
+                role: string;
+                parts: Array<{ text: string }>;
+            }>;
+        };
+    }) => Promise<{
+        candidates?: Array<{
+            content?: {
+                parts?: Array<{ text?: string }>;
+            };
+        }>;
+    }>;
+    models: {
+        gemini: (config: { model: string }) => InngestAIModel;
+    };
+}
+
+interface InngestStep {
+    ai: InngestAI;
+    run: <T>(id: string, fn: () => Promise<T> | T) => Promise<T>;
+}
+
 export const sendSignUpEmail = inngest.createFunction(
     { id: 'sign-up-email' },
     { event: 'app/user.created'},
-    async ({ event, step }: { event: UserCreatedEvent; step: any }) => {
+    async ({ event, step }: { event: UserCreatedEvent; step: InngestStep }) => {
         const userProfile = `
             - Country: ${event.data.country}
             - Investment goals: ${event.data.investmentGoals}
@@ -51,7 +81,7 @@ export const sendSignUpEmail = inngest.createFunction(
 export const sendDailyNewsSummary = inngest.createFunction(
     { id: 'daily-news-summary' },
     [ { event: 'app/send.daily.news' }, { cron: '0 12 * * *' } ],
-    async ({ step }: { step: any }) => {
+    async ({ step }: { step: InngestStep }) => {
         // Step #1: Get all users for news delivery
         const users = await step.run('get-all-users', getAllUsersForNewsEmail)
 
@@ -72,8 +102,8 @@ export const sendDailyNewsSummary = inngest.createFunction(
                         articles = (articles || []).slice(0, 6);
                     }
                     perUser.push({ user, articles });
-                } catch (e) {
-                    console.error('daily-news: error preparing user news', user.email, e);
+                } catch (error) {
+                    console.error('daily-news: error preparing user news', user.email, error);
                     perUser.push({ user, articles: [] });
                 }
             }
@@ -98,8 +128,8 @@ export const sendDailyNewsSummary = inngest.createFunction(
                     const newsContent = (part && 'text' in part ? part.text : null) || 'No market news.'
 
                     userNewsSummaries.push({ user, newsContent });
-                } catch (e) {
-                    console.error('Failed to summarize news for : ', user.email);
+                } catch (error) {
+                    console.error('Failed to summarize news for : ', user.email, error);
                     userNewsSummaries.push({ user, newsContent: null });
                 }
             }

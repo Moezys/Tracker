@@ -134,6 +134,8 @@ declare global {
 
     type ProfileData = {
         name?: string;
+        ticker?: string;
+        exchange?: string;
         marketCapitalization?: number;
     };
 
