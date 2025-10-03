@@ -23,14 +23,6 @@ A modern, real-time stock market tracking application built with Next.js 15, fea
 ### 🔔 Intelligent Notifications (Coming Soon)
 - **Price Alerts**: Upper and lower threshold notifications
 - **Volume Alerts**: Unusual trading activity detection
-- **Daily News Summaries**: Personalized market news delivered via email
-- **Email Templates**: Professional, responsive email notifications
-
-### 🎨 Design & User Experience
-- **Dark Theme**: Sleek dark interface optimized for extended use
-- **Modern UI Components**: Built with Radix UI and styled with Tailwind CSS
-- **Smooth Animations**: Enhanced user experience with Tailwind animations
-- **Mobile Responsive**: Optimized for all device sizes
 
 ## 🛠️ Tech Stack
 
@@ -251,7 +243,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Tailwind CSS](https://tailwindcss.com) for styling
 
 ---
-
-**Built with ❤️ by [Moezys](https://github.com/Moezys)**
 
 *Stay ahead of the markets with real-time insights and intelligent alerts.*
